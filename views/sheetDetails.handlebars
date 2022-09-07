@@ -1,0 +1,36 @@
+<h1>Add Sheet creds and Freshdesk API details</h1>
+{{#if error}}<span>{{error}}</span>{{/if}}
+<form method="POST" action="jobDetails" enctype="multipart/form-data">
+    <br>
+    <div class="form-group">
+        <label>Email address</label>
+        <br>
+        <input type="text" class="form-control" name="email" placeholder="enter email address" required="true">
+    </div>
+    <br>
+    <div class="form-group">
+        <label>Freshdesk URL</label>
+        <br>
+        <input type="text" class="form-control" name="fd_url" placeholder="format in company.freshdesk.com" required="true">
+    </div>
+    <br>
+    <div class="form-group">
+        <label>API key</label>
+        <br>
+        <input type="text" class="form-control" name="api_key" placeholder="enter API key" required="true">
+    </div>
+    <br>
+    <div class="form-group">
+        <label>Sheet ID</label>
+        <br>
+        <input type="text" class="form-control" name="sheetID" placeholder="enter sheet ID" required="true">
+    </div>
+    <br>
+    <div class="form-group">
+        <label>Share service account creds</label>
+        <br>
+        <input type="file" class="form-control" name="creds" required="true">
+    </div>
+    <br>
+    <input type="submit" class="btn btn-primary" value="Save">
+</form>
