@@ -23,6 +23,7 @@ const app = express();
 // Set engine
 app.engine('handlebars', exphbs.engine({ defaultLayout:'main'}));
 app.set('view engine', 'handlebars');
+app.set('port', process.env.PORT || 3000);
 
 // body-parser
 app.use(bodyParser.json());
@@ -35,7 +36,7 @@ app.use(express.static(path.join(__dirname, '/public')));
 app.use(methodOverride('_method'));
 
 // listen on port
-app.listen(port, function(){
+app.listen(process.env.PORT || 3000, function(){
     console.log('Server started on port ' + port);
 });
 
