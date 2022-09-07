@@ -130,7 +130,7 @@ app.post('/submitted', upload.none(), function(req, res, next){
         });
     }
     else{
-        console.log("Different columns yaay");
-        res.redirect('/');
+        const worker = new Worker('./sheetWorker.js',{workerData : req.body});
+        res.render('sheetDetails',{error: 'Job Submitted'});
     }
 });

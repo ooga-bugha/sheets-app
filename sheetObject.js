@@ -1,5 +1,4 @@
 const {google} = require('googleapis');
-const unirest = require('unirest');
 
 function Sheets(sheetId, client_email, private_key){
     this.sheetId = sheetId;
@@ -58,10 +57,12 @@ Sheets.prototype.setHeaderRow = async function(cl){
 }
 
 Sheets.prototype.addValues = async function(cl){
+    console.log("Started");
     const gsapi = google.sheets({version :'v4', auth : cl});
     updatedHeader = [];
     let i = 0;
     while(i<5000){
+        //console.log("Looping #" + i);
         if(i%200==0 && i>0){
             var range = this.primarySheetName + "!E" + String(i-198);
             var updateOpt = {
@@ -75,6 +76,7 @@ Sheets.prototype.addValues = async function(cl){
             let data = await gsapi.spreadsheets.values.update(updateOpt).catch(error => {
                 console.log(error);        
             });
+            await new Promise(resolve => setTimeout(resolve, 3000)); 
             console.log(`Push # ${i/200}`);
             updatedHeader= [];
         }
