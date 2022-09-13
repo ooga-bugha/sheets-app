@@ -175,7 +175,7 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
             });
             var jobStatus = jobResponse.body["status"];
 
-            // Start polling it till completion at intervals of 10 secs 10 times
+            // Start polling it till completion at intervals of 10 secs (max 10 times)
             let count = 0
             while (jobStatus == "IN_PROGRESS" && count < 10){
                 await new Promise(resolve => setTimeout(resolve, 10000));
@@ -212,7 +212,7 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
             }
             else{
                 console.log("Unsuccessful update");
-                for(let ticketIDs of ticketIDs){
+                for(let ticketID of ticketIDs){
                     responseCodes.push([jobID]); 
                     errorMessages.push(["Something went wrong"]);
                 }
