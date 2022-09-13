@@ -38,7 +38,7 @@ Sheets.prototype.getPrimarySheet = async function(cl){
     };
 
     let data = await gsapi.spreadsheets.get(opt).catch(error => {
-        console.log(error.response.status);        
+        console.log(error.response.status);  
     });
     
     this.primarySheetName = data.data.sheets[0].properties.title;
@@ -176,7 +176,7 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
             var jobStatus = jobResponse.body["status"];
 
             // Start polling it till completion at intervals of 10 secs (max 10 times)
-            let count = 0
+            var count = 0;
             while (jobStatus == "IN_PROGRESS" && count < 10){
                 await new Promise(resolve => setTimeout(resolve, 10000));
                 jobResponse = await unirest.get(`https://${ url }/api/v2/jobs/${ jobID }`).headers({
@@ -188,7 +188,7 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
                 console.log(jobStatus);
                 count+=1;
             }
-
+            count = 0;
             // Generate status/error message array and job ID payload
             if (jobStatus != "IN_PROGRESS" && jobResponse.body["data"]){
                 console.log("Successful update");
