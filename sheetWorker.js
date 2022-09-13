@@ -18,14 +18,7 @@ client.authorize(async function(err, tokens){
     else{
         await testSheet.getPrimarySheet(client);
         await testSheet.getHeaderRow(client);
-        if (testSheet.headerRow.includes("Response Status") & testSheet.headerRow.includes("Response Error")){
-            console.log("It's there");
-        }
-        else{
-            console.log("Nope, adding header values");
-            await testSheet.setHeaderRow(client);
-        }
-        console.log("Adding values");
-        await testSheet.addValues(client);
+        //console.log("Adding values");
+        await testSheet.bulkClose(client, workerData.ticket_id_column, workerData.response_code, workerData.error_message, workerData.api_key, workerData.fd_url);
     }
 });
