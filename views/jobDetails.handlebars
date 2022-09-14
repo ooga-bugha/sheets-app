@@ -31,6 +31,16 @@
             {{/each}}
         </select>
     </div>
+    <br>
+    <div class="form-group">
+        <label>Task to perform</label>
+        <br>
+        <select id="task" name="task" aria-placeholder="Select task" aria-required="true">
+            <option value="bulk_close">Bulk Close</option>
+            <option value="bulk_reopen">Bulk Reopen</option>
+            <option value="bulk_delete">Bulk Delete</option>
+        </select>
+    </div>
 
     <div class="form-group">
         <input type="hidden" class="form-control" name="sheet_ID" value="{{sheetID}}">
