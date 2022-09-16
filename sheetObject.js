@@ -388,6 +388,7 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
 
                 else{console.log(response.body);}
             }
+            console.log(response.body);
 
             // Get Job ID
 
