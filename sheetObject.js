@@ -216,6 +216,8 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
                 else{console.log(response.body);}
             }
 
+            console.log(response.body);
+
             // Get Job ID
 
             var jobID = String(response.body["job_id"]);
