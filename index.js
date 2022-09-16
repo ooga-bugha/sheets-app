@@ -152,7 +152,7 @@ app.post('/submitted', upload.none(), function(req, res, next){
             url:req.body.fd_url
         });
     }
-    if(req.body.task == "bulk_delete"){
+    else if(req.body.task == "bulk_delete"){
         res.render('jobDetails', {
             error:'Bulk deletion is in development',
             header:req.body.header, 

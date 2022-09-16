@@ -1,5 +1,10 @@
 <h1>Add Job Details</h1>
-{{#if error}}<span>{{error}}</span>{{/if}}
+{{#if error}}
+<div class="alert alert-dismissible alert-danger">
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  <strong>Oops!</strong> <a href="#" class="alert-link">{{error}}
+</div>
+{{/if}}
 <form method="POST" action="submitted" enctype="multipart/form-data">
     <br>
     <div class="form-group">
