@@ -192,7 +192,29 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
                     }
                 }
             });
-            console.log(response.body);
+            if(response.status >= 300){
+
+                // If rate limits breached, try again after 60 seconds
+
+                await new Promise(resolve => setTimeout(resolve, 60000));
+                response = await unirest.post(`https://${ url }/api/v2/tickets/bulk_update`).headers({
+                    'Content-Type': 'application/json',
+                    'Authorization':`Basic ${ apiKey }`
+                }).send({
+                    "bulk_action": {
+                        "ids": ticketIDs,
+                        "properties":{
+                            "status": 5
+                        }
+                    }
+                });
+
+                // End task if breached again
+
+                if(response.status>=300){break;}
+
+                else{console.log(response.body);}
+            }
 
             // Get Job ID
 
@@ -201,19 +223,33 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
                 'Content-Type': 'application/json',
                 'Authorization':`Basic ${ apiKey }`
             });
+
+            if(jobResponse.status >=300){
+                await new Promise(resolve => setTimeout(resolve, 60000));
+                var jobResponse = await unirest.get(`https://${ url }/api/v2/jobs/${ jobID }`).headers({
+                    'Content-Type': 'application/json',
+                    'Authorization':`Basic ${ apiKey }`
+                });
+                if(jobResponse.status >=300){break;}
+            }
             var jobStatus = jobResponse.body["status"];
 
             // Start polling 10 times or till completion at intervals of 10 secs
 
             var count = 0;
             while (jobStatus == "IN_PROGRESS" && count < 10){
+                console.log("Checking");
                 await new Promise(resolve => setTimeout(resolve, 10000));
                 jobResponse = await unirest.get(`https://${ url }/api/v2/jobs/${ jobID }`).headers({
                     'Content-Type': 'application/json',
                     'Authorization':`Basic ${ apiKey }`
                 });
+                if(jobResponse.status>=300){
+                    await new Promise(resolve => setTimeout(resolve, 50000));
+                    count+=1
+                    continue;
+                }
                 jobStatus = String(jobResponse.body["status"]);
-                console.log("Checking");
                 console.log(jobStatus);
                 count+=1;
             }
@@ -274,6 +310,7 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
     var ticketsColA1 = getA1Notation(0,this.headerRow.indexOf(ticketsCol)).slice(0,-1);
     var resCodeColA1 = getA1Notation(0,this.headerRow.indexOf(resCodeCol)).slice(0,-1);
     var errMsgColA1 = getA1Notation(0,this.headerRow.indexOf(errMsgCol)).slice(0,-1);
+    var rateLimitBreach = 0;
     var ticketIDs = [];
     var responseCodes = [];
     var errorMessages = [];
@@ -328,8 +365,29 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
                     }
                 }
             });
-            console.log(response.status);
-            console.log(response.body);
+            if(response.status >= 300){
+
+                // If rate limits breached, try again after 60 seconds
+
+                await new Promise(resolve => setTimeout(resolve, 60000));
+                response = await unirest.post(`https://${ url }/api/v2/tickets/bulk_update`).headers({
+                    'Content-Type': 'application/json',
+                    'Authorization':`Basic ${ apiKey }`
+                }).send({
+                    "bulk_action": {
+                        "ids": ticketIDs,
+                        "properties":{
+                            "status": 2
+                        }
+                    }
+                });
+
+                // End task if breached again
+
+                if(response.status>=300){break;}
+
+                else{console.log(response.body);}
+            }
 
             // Get Job ID
 
@@ -338,23 +396,39 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
                 'Content-Type': 'application/json',
                 'Authorization':`Basic ${ apiKey }`
             });
+
+            if(jobResponse.status >=300){
+                await new Promise(resolve => setTimeout(resolve, 60000));
+                var jobResponse = await unirest.get(`https://${ url }/api/v2/jobs/${ jobID }`).headers({
+                    'Content-Type': 'application/json',
+                    'Authorization':`Basic ${ apiKey }`
+                });
+                if(jobResponse.status >=300){break;}
+            }
+
             var jobStatus = jobResponse.body["status"];
 
             // Start polling 10 times or till completion at intervals of 10 secs
 
             var count = 0;
             while (jobStatus == "IN_PROGRESS" && count < 10){
+                console.log("Checking");
                 await new Promise(resolve => setTimeout(resolve, 10000));
                 jobResponse = await unirest.get(`https://${ url }/api/v2/jobs/${ jobID }`).headers({
                     'Content-Type': 'application/json',
                     'Authorization':`Basic ${ apiKey }`
                 });
+                if(jobResponse.status>=300){
+                    await new Promise(resolve => setTimeout(resolve, 50000));
+                    count+=1
+                    continue;
+                }
                 jobStatus = String(jobResponse.body["status"]);
-                console.log("Checking");
                 console.log(jobStatus);
                 count+=1;
             }
             count = 0;
+
             // Generate status/error message array and job ID payload
 
             if (jobStatus != "IN_PROGRESS" && jobResponse.body["data"]){
