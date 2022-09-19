@@ -166,6 +166,6 @@ app.post('/submitted', upload.none(), function(req, res, next){
     }
     else{
         const worker = new Worker('./sheetWorker.js',{workerData : req.body});
-        res.render('sheetDetails',{error: 'Job Submitted'});
+        res.render('sheetDetails',{success: 'Job Submitted'});
     }
 });

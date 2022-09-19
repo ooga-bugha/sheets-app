@@ -1,4 +1,10 @@
 <h1>Add Sheet creds and Freshdesk API details</h1>
+{{#if success}}
+<div class="alert alert-dismissible alert-success">
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  <strong>Job Submitted!</strong> Sit back and relax...
+</div>
+{{/if}}
 {{#if error}}<div class="alert alert-dismissible alert-danger">
   <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
   <strong>Oh snap!</strong> <a href="#" class="alert-link">{{error}}

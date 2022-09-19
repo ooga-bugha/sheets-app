@@ -125,18 +125,12 @@ Sheets.prototype.addValues = async function(cl, resCodeCol, errMsgCol){
 // Bulk close method
 
 Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCol, apiKey, url){
-
-    // Convert API key to B64
-
     apiKey = Buffer.from(apiKey).toString('base64');
     const gsapi = google.sheets({version :'v4', auth : cl});
-
-    // Get column A1 notation
-
     var ticketsColA1 = getA1Notation(0,this.headerRow.indexOf(ticketsCol)).slice(0,-1);
     var resCodeColA1 = getA1Notation(0,this.headerRow.indexOf(resCodeCol)).slice(0,-1);
     var errMsgColA1 = getA1Notation(0,this.headerRow.indexOf(errMsgCol)).slice(0,-1);
-
+    var rateLimitBreach = 0;
     var ticketIDs = [];
     var responseCodes = [];
     var errorMessages = [];
@@ -175,12 +169,11 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
             });
 
             console.log(ticketIDs);
+
+            // Make Bulk Update call
             if(ticketIDs.length == 0){
                 continue;
             }
-
-            // Make Bulk Update call
-
             var response = await unirest.post(`https://${ url }/api/v2/tickets/bulk_update`).headers({
                 'Content-Type': 'application/json',
                 'Authorization':`Basic ${ apiKey }`
@@ -192,7 +185,10 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
                     }
                 }
             });
+            console.log("Response for bulk actions is " + response.status);
             if(response.status >= 300){
+
+                console.log("Retrying in 1 minute since response is not OK");
 
                 // If rate limits breached, try again after 60 seconds
 
@@ -213,9 +209,8 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
 
                 if(response.status>=300){break;}
 
-                else{console.log(response.body);}
+                else{console.log("Response for bulk actions is " + response.status);}
             }
-
             console.log(response.body);
 
             // Get Job ID
@@ -234,12 +229,13 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
                 });
                 if(jobResponse.status >=300){break;}
             }
+
             var jobStatus = jobResponse.body["status"];
 
             // Start polling 10 times or till completion at intervals of 10 secs
 
             var count = 0;
-            while ((jobStatus == "IN_PROGRESS" || jobStatus == "QUEUED") && count < 10){
+            while (jobStatus == "IN_PROGRESS" && count < 10){
                 console.log("Checking");
                 if(jobStatus == "IN_PROGRESS"){
                     await new Promise(resolve => setTimeout(resolve, 10000));
@@ -268,7 +264,7 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
 
             // Generate status/error message array and job ID payload
 
-            if (jobStatus != "IN_PROGRESS" && jobResponse.body["data"]){
+            if (jobStatus != "IN_PROGRESS" || "QUEUED" && jobResponse.body["data"]){
                 console.log("Successful update");
                 for(let ticketID of ticketIDs){
                     for(let status of jobResponse.body["data"]){
@@ -287,6 +283,13 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
                     }
                 }
                 console.log(errorMessages);
+            }
+            else if(jobStatus == "IN_PROGRESS" || "QUEUED" ){
+                console.log("Ongoing update");
+                for(let ticketID of ticketIDs){
+                    responseCodes.push([jobID]); 
+                    errorMessages.push(["Ongoing update"]);
+                }
             }
             else{
                 console.log("Unsuccessful update");
@@ -376,7 +379,10 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
                     }
                 }
             });
+            console.log("Response for bulk actions is " + response.status);
             if(response.status >= 300){
+
+                console.log("Retrying in 1 minute since response is not OK");
 
                 // If rate limits breached, try again after 60 seconds
 
@@ -397,7 +403,7 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
 
                 if(response.status>=300){break;}
 
-                else{console.log(response.body);}
+                else{console.log("Response for bulk actions is " + response.status);}
             }
             console.log(response.body);
 
@@ -452,7 +458,7 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
 
             // Generate status/error message array and job ID payload
 
-            if (jobStatus != "IN_PROGRESS" && jobResponse.body["data"]){
+            if (jobStatus != "IN_PROGRESS" || "QUEUED" && jobResponse.body["data"]){
                 console.log("Successful update");
                 for(let ticketID of ticketIDs){
                     for(let status of jobResponse.body["data"]){
@@ -471,6 +477,13 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
                     }
                 }
                 console.log(errorMessages);
+            }
+            else if(jobStatus == "IN_PROGRESS" || "QUEUED" ){
+                console.log("Ongoing update");
+                for(let ticketID of ticketIDs){
+                    responseCodes.push([jobID]); 
+                    errorMessages.push(["Ongoing update"]);
+                }
             }
             else{
                 console.log("Unsuccessful update");
