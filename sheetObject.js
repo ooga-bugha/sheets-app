@@ -239,15 +239,24 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
             // Start polling 10 times or till completion at intervals of 10 secs
 
             var count = 0;
-            while (jobStatus == "IN_PROGRESS" && count < 10){
+            while ((jobStatus == "IN_PROGRESS" || jobStatus == "QUEUED") && count < 10){
                 console.log("Checking");
-                await new Promise(resolve => setTimeout(resolve, 10000));
-                jobResponse = await unirest.get(`https://${ url }/api/v2/jobs/${ jobID }`).headers({
-                    'Content-Type': 'application/json',
-                    'Authorization':`Basic ${ apiKey }`
-                });
+                if(jobStatus == "IN_PROGRESS"){
+                    await new Promise(resolve => setTimeout(resolve, 10000));
+                    jobResponse = await unirest.get(`https://${ url }/api/v2/jobs/${ jobID }`).headers({
+                        'Content-Type': 'application/json',
+                        'Authorization':`Basic ${ apiKey }`
+                    });
+                }
+                else if(jobStatus == "QUEUED"){
+                    await new Promise(resolve => setTimeout(resolve, 60000));
+                    jobResponse = await unirest.get(`https://${ url }/api/v2/jobs/${ jobID }`).headers({
+                        'Content-Type': 'application/json',
+                        'Authorization':`Basic ${ apiKey }`
+                    });
+                }
                 if(jobResponse.status>=300){
-                    await new Promise(resolve => setTimeout(resolve, 50000));
+                    await new Promise(resolve => setTimeout(resolve, 60000));
                     count+=1
                     continue;
                 }
@@ -416,13 +425,22 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
             var count = 0;
             while (jobStatus == "IN_PROGRESS" && count < 10){
                 console.log("Checking");
-                await new Promise(resolve => setTimeout(resolve, 10000));
-                jobResponse = await unirest.get(`https://${ url }/api/v2/jobs/${ jobID }`).headers({
-                    'Content-Type': 'application/json',
-                    'Authorization':`Basic ${ apiKey }`
-                });
+                if(jobStatus == "IN_PROGRESS"){
+                    await new Promise(resolve => setTimeout(resolve, 10000));
+                    jobResponse = await unirest.get(`https://${ url }/api/v2/jobs/${ jobID }`).headers({
+                        'Content-Type': 'application/json',
+                        'Authorization':`Basic ${ apiKey }`
+                    });
+                }
+                else if(jobStatus == "QUEUED"){
+                    await new Promise(resolve => setTimeout(resolve, 60000));
+                    jobResponse = await unirest.get(`https://${ url }/api/v2/jobs/${ jobID }`).headers({
+                        'Content-Type': 'application/json',
+                        'Authorization':`Basic ${ apiKey }`
+                    });
+                }
                 if(jobResponse.status>=300){
-                    await new Promise(resolve => setTimeout(resolve, 50000));
+                    await new Promise(resolve => setTimeout(resolve, 60000));
                     count+=1
                     continue;
                 }
