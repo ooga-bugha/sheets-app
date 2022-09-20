@@ -299,7 +299,6 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
                             }
                             break;
                         }
-                        i+=100;
                         continue;
                     }
                 }
@@ -514,7 +513,6 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
                             }
                             break;
                         }
-                        i+=100;
                         continue;
                     }
                 }
