@@ -235,7 +235,7 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
             // Start polling 10 times or till completion at intervals of 10 secs
 
             var count = 0;
-            while (jobStatus == "IN_PROGRESS" && count < 10){
+            while ((jobStatus == "IN_PROGRESS" || "QUEUED" || !jobResponse.body["data"]) && count < 10){
                 console.log("Checking");
                 if(jobStatus == "IN_PROGRESS"){
                     await new Promise(resolve => setTimeout(resolve, 10000));
@@ -429,7 +429,7 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
             // Start polling 10 times or till completion at intervals of 10 secs
 
             var count = 0;
-            while (jobStatus == "IN_PROGRESS" && count < 10){
+            while ((jobStatus == "IN_PROGRESS" || "QUEUED" || !jobResponse.body["data"]) && count < 10){
                 console.log("Checking");
                 if(jobStatus == "IN_PROGRESS"){
                     await new Promise(resolve => setTimeout(resolve, 10000));
