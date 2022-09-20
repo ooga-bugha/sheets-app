@@ -207,7 +207,11 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
 
                 // End task if breached again
 
-                if(response.status>=300){break;}
+                if(response.status>=300){
+                    console.log("Unable to Submit Job");
+                    i+=100;
+                    continue;
+                }
 
                 else{console.log("Response for bulk actions is " + response.status);}
             }
@@ -227,12 +231,28 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
                     'Content-Type': 'application/json',
                     'Authorization':`Basic ${ apiKey }`
                 });
-                if(jobResponse.status >=300){break;}
+                if(jobResponse.status >=300){
+                    console.log("Unable to Submit Job");
+                    i+=100;
+                    continue;
+                }
             }
 
             var jobStatus = jobResponse.body["status"];
 
             // Start polling 10 times or till completion at intervals of 10 secs
+
+            for(let ticketID of ticketIDs){
+                responseCodes.push([jobID]); 
+                //errorMessages.push(["Something went wrong"]);
+            }
+
+            responseCodeOpt.range = this.primarySheetName + "!" + resCodeColA1 + String(i+2);
+            responseCodeOpt.resource.values = responseCodes;
+            let resCodeUpdate = await gsapi.spreadsheets.values.update(responseCodeOpt).catch(error => {
+                console.log(error);        
+            });
+
 
             var count = 0;
             while ((jobStatus == "IN_PROGRESS" || "QUEUED" || !jobResponse.body["data"]) && count < 10){
@@ -279,6 +299,7 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
                             }
                             break;
                         }
+                        i+=100;
                         continue;
                     }
                 }
@@ -294,7 +315,7 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
             else{
                 console.log("Unsuccessful update");
                 for(let ticketID of ticketIDs){
-                    responseCodes.push([jobID]); 
+                    //responseCodes.push([jobID]); 
                     errorMessages.push(["Something went wrong"]);
                 }
             }
@@ -302,15 +323,15 @@ Sheets.prototype.bulkClose = async function(cl, ticketsCol, resCodeCol, errMsgCo
             // Send errorMessages list to sheet
 
             errorMessageOpt.range = this.primarySheetName + "!" + errMsgColA1 + String(i+2);
-            responseCodeOpt.range = this.primarySheetName + "!" + resCodeColA1 + String(i+2);
+            //responseCodeOpt.range = this.primarySheetName + "!" + resCodeColA1 + String(i+2);
             errorMessageOpt.resource.values = errorMessages;
-            responseCodeOpt.resource.values = responseCodes;
+            //responseCodeOpt.resource.values = responseCodes;
             let errMsgUpdate = await gsapi.spreadsheets.values.update(errorMessageOpt).catch(error => {
                 console.log(error);        
             });
-            let resCodeUpdate = await gsapi.spreadsheets.values.update(responseCodeOpt).catch(error => {
-                console.log(error);        
-            });
+            // let resCodeUpdate = await gsapi.spreadsheets.values.update(responseCodeOpt).catch(error => {
+            //     console.log(error);        
+            // });
 
         }
         i+=100;
@@ -401,7 +422,11 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
 
                 // End task if breached again
 
-                if(response.status>=300){break;}
+                if(response.status>=300){
+                    console.log("Unable to Submit Job");
+                    i+=100;
+                    continue;
+                }
 
                 else{console.log("Response for bulk actions is " + response.status);}
             }
@@ -421,12 +446,28 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
                     'Content-Type': 'application/json',
                     'Authorization':`Basic ${ apiKey }`
                 });
-                if(jobResponse.status >=300){break;}
+                if(jobResponse.status >=300){
+                    console.log("Unable to Submit Job");
+                    i+=100;
+                    continue;
+                }
             }
 
             var jobStatus = jobResponse.body["status"];
 
             // Start polling 10 times or till completion at intervals of 10 secs
+
+            for(let ticketID of ticketIDs){
+                responseCodes.push([jobID]); 
+                //errorMessages.push(["Something went wrong"]);
+            }
+
+            responseCodeOpt.range = this.primarySheetName + "!" + resCodeColA1 + String(i+2);
+            responseCodeOpt.resource.values = responseCodes;
+            let resCodeUpdate = await gsapi.spreadsheets.values.update(responseCodeOpt).catch(error => {
+                console.log(error);        
+            });
+
 
             var count = 0;
             while ((jobStatus == "IN_PROGRESS" || "QUEUED" || !jobResponse.body["data"]) && count < 10){
@@ -473,6 +514,7 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
                             }
                             break;
                         }
+                        i+=100;
                         continue;
                     }
                 }
@@ -488,7 +530,7 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
             else{
                 console.log("Unsuccessful update");
                 for(let ticketID of ticketIDs){
-                    responseCodes.push([jobID]); 
+                    //responseCodes.push([jobID]); 
                     errorMessages.push(["Something went wrong"]);
                 }
             }
@@ -496,15 +538,15 @@ Sheets.prototype.bulkReopen = async function(cl, ticketsCol, resCodeCol, errMsgC
             // Send errorMessages list to sheet
 
             errorMessageOpt.range = this.primarySheetName + "!" + errMsgColA1 + String(i+2);
-            responseCodeOpt.range = this.primarySheetName + "!" + resCodeColA1 + String(i+2);
+            //responseCodeOpt.range = this.primarySheetName + "!" + resCodeColA1 + String(i+2);
             errorMessageOpt.resource.values = errorMessages;
-            responseCodeOpt.resource.values = responseCodes;
+            //responseCodeOpt.resource.values = responseCodes;
             let errMsgUpdate = await gsapi.spreadsheets.values.update(errorMessageOpt).catch(error => {
                 console.log(error);        
             });
-            let resCodeUpdate = await gsapi.spreadsheets.values.update(responseCodeOpt).catch(error => {
-                console.log(error);        
-            });
+            // let resCodeUpdate = await gsapi.spreadsheets.values.update(responseCodeOpt).catch(error => {
+            //     console.log(error);        
+            // });
 
         }
         i+=100;
